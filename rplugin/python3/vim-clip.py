@@ -1,4 +1,5 @@
 import neovim
+import os
 
 
 @neovim.plugin
@@ -24,9 +25,11 @@ class VimClip:
 
         return '\n'.join(lines)
 
+    def copy_to_clipboard(self, text):
+        os.system('echo "{}" | pbcopy'.format(text))
+
     @neovim.command('Clip', sync=True, range='')
     def clip(self, *args, **kwargs):
         visual_selection = self.get_visual_selection()
         if visual_selection is not None:
-            with open('test.out', 'w+') as f:
-                f.write(visual_selection)
+            self.copy_to_clipboard(visual_selection)
