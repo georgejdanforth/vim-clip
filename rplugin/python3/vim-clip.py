@@ -7,7 +7,7 @@ Usage: In visual selection mode, simply execute the :Clip command, and your
 selection will be copied to the system clipboard.
 """
 import neovim
-import os
+import subprocess
 
 
 @neovim.plugin
@@ -63,7 +63,15 @@ class VimClip:
         Returns:
             None
         """
-        os.system('echo "{}" | pbcopy'.format(text))
+        try:
+            subprocess.Popen(
+                ['pbcopy'],
+                stdin=subprocess.PIPE
+            ).communicate(text.encode('utf-8'))
+            self.nvim.command('echo "Copied to clipboard!"')
+        except OSError:
+            self.nvim.command('Failure: Check to make sure XCode is installed.')
+
 
     @neovim.command('Clip', sync=True, range='')
     def clip(self, *args, **kwargs):
